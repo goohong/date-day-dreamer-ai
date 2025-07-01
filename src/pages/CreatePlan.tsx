@@ -7,7 +7,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Users, MapPin, Calendar, Plus, Sparkles } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, Users, MapPin, Calendar, Plus, Sparkles, Clock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const CreatePlan = () => {
@@ -16,7 +17,10 @@ const CreatePlan = () => {
     people: "",
     location: "",
     planType: "",
-    duration: "",
+    detailedCategories: [] as string[],
+    customActivities: "",
+    startTime: "",
+    endTime: "",
     specialPlaces: "",
     preferences: ""
   });
@@ -38,9 +42,30 @@ const CreatePlan = () => {
     }
   };
 
-  const updateFormData = (field: string, value: string) => {
+  const updateFormData = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    const currentCategories = formData.detailedCategories;
+    if (checked) {
+      updateFormData('detailedCategories', [...currentCategories, category]);
+    } else {
+      updateFormData('detailedCategories', currentCategories.filter(c => c !== category));
+    }
+  };
+
+  const categoryOptions = {
+    relaxed: ["카페", "공원", "쇼핑몰", "북카페", "산책로", "전망대"],
+    foodie: ["한식", "양식", "일식", "중식", "디저트", "술집", "브런치"],
+    active: ["볼링", "노래방", "게임", "스포츠", "체험활동", "워크숍"],
+    culture: ["전시회", "박물관", "영화관", "공연", "갤러리", "문화센터"]
+  };
+
+  const timeOptions = Array.from({ length: 24 }, (_, i) => {
+    const hour = i.toString().padStart(2, '0');
+    return `${hour}:00`;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-orange-50">
@@ -139,39 +164,91 @@ const CreatePlan = () => {
 
               <div className="space-y-6">
                 <div>
-                  <Label className="text-base font-medium mb-3 block">일정 종류</Label>
+                  <Label className="text-base font-medium mb-3 block">일정 종류 (대분류)</Label>
                   <RadioGroup value={formData.planType} onValueChange={(value) => updateFormData('planType', value)}>
                     <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
                       <RadioGroupItem value="relaxed" id="relaxed" />
-                      <Label htmlFor="relaxed">여유로운 휴식 (카페, 공원, 쇼핑)</Label>
+                      <Label htmlFor="relaxed">여유로운 휴식</Label>
                     </div>
                     <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
                       <RadioGroupItem value="foodie" id="foodie" />
-                      <Label htmlFor="foodie">맛집 탐방 (레스토랑, 디저트, 술집)</Label>
+                      <Label htmlFor="foodie">맛집 탐방</Label>
                     </div>
                     <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
                       <RadioGroupItem value="active" id="active" />
-                      <Label htmlFor="active">액티비티 (볼링, 노래방, 체험)</Label>
+                      <Label htmlFor="active">액티비티</Label>
                     </div>
                     <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
                       <RadioGroupItem value="culture" id="culture" />
-                      <Label htmlFor="culture">문화생활 (전시, 영화, 공연)</Label>
+                      <Label htmlFor="culture">문화생활</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
+                {formData.planType && (
+                  <div>
+                    <Label className="text-base font-medium mb-3 block">세부 카테고리 (선택사항)</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {categoryOptions[formData.planType as keyof typeof categoryOptions]?.map((category) => (
+                        <div key={category} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={category}
+                            checked={formData.detailedCategories.includes(category)}
+                            onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                          />
+                          <Label htmlFor={category} className="text-sm">{category}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
-                  <Label htmlFor="duration" className="text-base font-medium mb-3 block">일정 시간</Label>
-                  <Select value={formData.duration} onValueChange={(value) => updateFormData('duration', value)}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="시간대를 선택해주세요" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="half-day">반나절 (4-5시간)</SelectItem>
-                      <SelectItem value="full-day">하루 종일 (8-10시간)</SelectItem>
-                      <SelectItem value="evening">저녁 시간 (3-4시간)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="custom-activities" className="text-base font-medium mb-3 block">
+                    원하는 활동이나 메뉴 (자유 입력)
+                  </Label>
+                  <Input
+                    id="custom-activities"
+                    placeholder="예: 치킨, 피자, 레이저태그, 방탈출"
+                    value={formData.customActivities}
+                    onChange={(e) => updateFormData('customActivities', e.target.value)}
+                  />
+                  <p className="text-sm text-gray-500 mt-1">여러 항목은 쉼표(,)로 구분해주세요</p>
+                </div>
+
+                <div>
+                  <Label className="text-base font-medium mb-3 block">
+                    <Clock className="w-4 h-4 inline mr-2" />
+                    일정 시간대
+                  </Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="start-time" className="text-sm text-gray-600 mb-1 block">시작 시간</Label>
+                      <Select value={formData.startTime} onValueChange={(value) => updateFormData('startTime', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="시작 시간" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeOptions.map((time) => (
+                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="end-time" className="text-sm text-gray-600 mb-1 block">종료 시간</Label>
+                      <Select value={formData.endTime} onValueChange={(value) => updateFormData('endTime', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="종료 시간" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeOptions.map((time) => (
+                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -230,7 +307,7 @@ const CreatePlan = () => {
               onClick={handleNext}
               disabled={
                 (step === 1 && (!formData.people || !formData.location)) ||
-                (step === 2 && (!formData.planType || !formData.duration))
+                (step === 2 && (!formData.planType || !formData.startTime || !formData.endTime))
               }
               className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white px-6"
             >

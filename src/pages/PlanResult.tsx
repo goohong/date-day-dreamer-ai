@@ -1,263 +1,255 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Clock, MapPin, Share2, Edit3, Heart, Star, Users, Calendar } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Clock, MapPin, Share2, Heart, Star, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
-interface PlanItem {
-  time: string;
-  title: string;
-  description: string;
-  location: string;
-  duration: string;
-  type: 'restaurant' | 'cafe' | 'activity' | 'culture' | 'shopping';
-  rating?: number;
-}
+// Mock data generator for multiple plan options
+const generatePlanOptions = (formData: any) => {
+  const plans = [
+    {
+      id: 1,
+      title: "로맨틱 코스",
+      description: "분위기 좋은 장소들로 구성된 감성적인 코스",
+      rating: 4.8,
+      duration: `${formData.startTime || '10:00'} - ${formData.endTime || '18:00'}`,
+      totalTime: "8시간",
+      activities: [
+        { time: formData.startTime || "10:00", place: "블루보틀 커피 홍대점", activity: "모닝 커피", duration: "1시간" },
+        { time: "11:30", place: "홍대 걷고싶은거리", activity: "산책 및 쇼핑", duration: "2시간" },
+        { time: "13:30", place: "더현대 서울", activity: "점심 식사", duration: "1.5시간" },
+        { time: "15:30", place: "한강공원 여의도", activity: "피크닉", duration: "2시간" },
+        { time: "18:00", place: "63빌딩 전망대", activity: "석양 감상", duration: "1시간" }
+      ]
+    },
+    {
+      id: 2,
+      title: "액티브 코스",
+      description: "활동적이고 재미있는 체험 중심의 코스",
+      rating: 4.6,
+      duration: `${formData.startTime || '10:00'} - ${formData.endTime || '18:00'}`,
+      totalTime: "8시간",
+      activities: [
+        { time: formData.startTime || "10:00", place: "홍대 볼링장", activity: "볼링", duration: "1.5시간" },
+        { time: "12:00", place: "교촌치킨 홍대점", activity: "점심 식사", duration: "1시간" },
+        { time: "14:00", place: "홍대 방탈출 카페", activity: "방탈출 게임", duration: "1.5시간" },
+        { time: "16:00", place: "홍대 노래방", activity: "노래방", duration: "1.5시간" },
+        { time: "18:00", place: "홍대 포차거리", activity: "저녁 식사", duration: "2시간" }
+      ]
+    },
+    {
+      id: 3,
+      title: "힐링 코스",
+      description: "여유롭고 편안한 휴식 중심의 코스",
+      rating: 4.7,
+      duration: `${formData.startTime || '10:00'} - ${formData.endTime || '18:00'}`,
+      totalTime: "8시간",
+      activities: [
+        { time: formData.startTime || "10:00", place: "망원한강공원", activity: "아침 산책", duration: "1시간" },
+        { time: "11:30", place: "테라로사 홍대점", activity: "브런치 & 커피", duration: "2시간" },
+        { time: "14:00", place: "홍대 독립서점", activity: "책 구경", duration: "1시간" },
+        { time: "15:30", place: "홍대 스파", activity: "마사지 & 휴식", duration: "2시간" },
+        { time: "18:00", place: "홍대 루프탑 바", activity: "선셋 드링크", duration: "1.5시간" }
+      ]
+    }
+  ];
+
+  return plans;
+};
 
 const PlanResult = () => {
   const location = useLocation();
-  const { toast } = useToast();
-  const [formData] = useState(location.state?.formData || {});
-  const [isGenerating, setIsGenerating] = useState(true);
-  const [planItems, setPlanItems] = useState<PlanItem[]>([]);
-
-  // Mock AI plan generation
-  useEffect(() => {
-    const generatePlan = () => {
-      setIsGenerating(true);
-      
-      setTimeout(() => {
-        // Mock plan based on form data
-        const mockPlan: PlanItem[] = [
-          {
-            time: "11:00",
-            title: "브런치 카페",
-            description: "홍대 감성이 가득한 브런치 카페에서 여유로운 시작",
-            location: "서울시 마포구 홍익로",
-            duration: "90분",
-            type: "cafe",
-            rating: 4.5
-          },
-          {
-            time: "12:30",
-            title: "홍대 거리 산책",
-            description: "홍대의 독특한 벽화와 거리 예술을 감상하며 산책",
-            location: "홍익대학교 주변",
-            duration: "60분",
-            type: "activity",
-            rating: 4.2
-          },
-          {
-            time: "14:00",
-            title: "팝업스토어 구경",
-            description: "최신 트렌드 팝업스토어에서 쇼핑과 구경",
-            location: "홍대 AK플라자",
-            duration: "90분",
-            type: "shopping",
-            rating: 4.3
-          },
-          {
-            time: "16:00",
-            title: "루프탑 카페",
-            description: "분위기 좋은 루프탑에서 음료와 디저트 타임",
-            location: "서울시 마포구 양화로",
-            duration: "120분",
-            type: "cafe",
-            rating: 4.7
-          },
-          {
-            time: "18:30",
-            title: "홍대 맛집 저녁",
-            description: "SNS에서 유명한 홍대 대표 맛집에서 저녁 식사",
-            location: "서울시 마포구 어울마당로",
-            duration: "90분",
-            type: "restaurant",
-            rating: 4.6
-          },
-        ];
-
-        setPlanItems(mockPlan);
-        setIsGenerating(false);
-      }, 2000);
-    };
-
-    generatePlan();
-  }, []);
-
-  const getTypeColor = (type: string) => {
-    const colors = {
-      restaurant: "bg-red-100 text-red-700",
-      cafe: "bg-amber-100 text-amber-700",
-      activity: "bg-blue-100 text-blue-700",
-      culture: "bg-purple-100 text-purple-700",
-      shopping: "bg-green-100 text-green-700"
-    };
-    return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-700";
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'restaurant': return '🍽️';
-      case 'cafe': return '☕';
-      case 'activity': return '🎯';
-      case 'culture': return '🎭';
-      case 'shopping': return '🛍️';
-      default: return '📍';
-    }
-  };
+  const formData = location.state?.formData || {};
+  const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
+  const [planOptions] = useState(() => generatePlanOptions(formData));
 
   const handleShare = () => {
-    const shareUrl = `${window.location.origin}/shared/abc123`;
-    navigator.clipboard.writeText(shareUrl);
-    toast({
-      title: "공유 링크가 복사되었습니다!",
-      description: "친구들과 함께 일정을 확인해보세요.",
-    });
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("링크가 복사되었습니다!");
   };
 
-  if (isGenerating) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-orange-50 flex items-center justify-center">
-        <Card className="p-8 text-center max-w-md mx-auto shadow-lg">
-          <div className="animate-spin w-16 h-16 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <div className="w-8 h-8 bg-white rounded-full"></div>
-          </div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">AI가 완벽한 일정을 생성 중이에요</h3>
-          <p className="text-gray-600">잠시만 기다려주세요...</p>
-        </Card>
-      </div>
-    );
-  }
+  const handleSelectPlan = (planId: number) => {
+    setSelectedPlan(planId);
+    toast.success("일정이 선택되었습니다!");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-orange-50">
       {/* Header */}
       <header className="px-6 py-4 bg-white/80 backdrop-blur-sm border-b border-pink-100">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link to="/create" className="flex items-center space-x-2 text-gray-600 hover:text-gray-800">
             <ArrowLeft className="w-5 h-5" />
             <span>다시 만들기</span>
           </Link>
-          <div className="flex items-center space-x-4">
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>공유하기</span>
-            </Button>
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-semibold bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-transparent">
+              DatePlanner AI
+            </span>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Plan Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-2 rounded-full mb-4">
-            <Heart className="w-4 h-4" />
-            <span className="font-medium">완벽한 데이트 코스가 완성되었어요!</span>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            {formData.location === 'hongdae' ? '홍대' : formData.location} 데이트 일정
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        {/* Title Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            🎉 AI가 추천하는 완벽한 일정
           </h1>
-          <div className="flex items-center justify-center space-x-4 text-gray-600">
-            <div className="flex items-center space-x-1">
-              <Users className="w-4 h-4" />
-              <span>{formData.people === '2' ? '2명 (커플)' : `${formData.people}명`}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Calendar className="w-4 h-4" />
-              <span>{formData.duration === 'half-day' ? '반나절' : formData.duration === 'full-day' ? '하루 종일' : '저녁 시간'}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <MapPin className="w-4 h-4" />
-              <span>총 5개 장소</span>
-            </div>
+          <p className="text-lg text-gray-600 mb-6">
+            {formData.people}명 • {formData.location} • {formData.planType === 'relaxed' ? '여유로운 휴식' : 
+             formData.planType === 'foodie' ? '맛집 탐방' : 
+             formData.planType === 'active' ? '액티비티' : '문화생활'}
+          </p>
+          <div className="flex items-center justify-center space-x-4">
+            <Badge variant="secondary" className="px-4 py-2">
+              <Clock className="w-4 h-4 mr-2" />
+              {formData.startTime || '10:00'} - {formData.endTime || '18:00'}
+            </Badge>
+            {formData.detailedCategories?.length > 0 && (
+              <Badge variant="outline" className="px-4 py-2">
+                {formData.detailedCategories.join(', ')}
+              </Badge>
+            )}
           </div>
         </div>
 
-        {/* Timeline */}
-        <div className="space-y-6">
-          {planItems.map((item, index) => (
-            <Card key={index} className="p-6 hover:shadow-lg transition-shadow duration-300 border-pink-100">
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {item.time.split(':')[0]}
+        {/* Plan Options */}
+        <div className="grid gap-8 mb-12">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            3가지 추천 코스 중 선택해보세요
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {planOptions.map((plan) => (
+              <Card 
+                key={plan.id} 
+                className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                  selectedPlan === plan.id 
+                    ? 'ring-2 ring-pink-500 bg-pink-50' 
+                    : 'hover:shadow-md'
+                }`}
+                onClick={() => handleSelectPlan(plan.id)}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-gray-800">{plan.title}</h3>
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <span className="text-sm font-medium">{plan.rating}</span>
                   </div>
-                  {index < planItems.length - 1 && (
-                    <div className="w-0.5 h-12 bg-gradient-to-b from-pink-300 to-orange-300 mx-auto mt-2"></div>
+                </div>
+                
+                <p className="text-gray-600 mb-4">{plan.description}</p>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <Clock className="w-4 h-4" />
+                    <span>{plan.duration}</span>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    총 {plan.activities.length}개 장소
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {plan.activities.slice(0, 3).map((activity, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-800">{activity.place}</div>
+                        <div className="text-xs text-gray-500">{activity.time} • {activity.activity}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {plan.activities.length > 3 && (
+                    <div className="text-xs text-gray-400 text-center">
+                      +{plan.activities.length - 3}개 더 보기
+                    </div>
                   )}
                 </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-3">
-                      <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
-                      <Badge className={getTypeColor(item.type)}>
-                        {getTypeIcon(item.type)} {item.type === 'restaurant' ? '맛집' : item.type === 'cafe' ? '카페' : item.type === 'activity' ? '활동' : item.type === 'culture' ? '문화' : '쇼핑'}
-                      </Badge>
-                      {item.rating && (
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="text-sm font-medium">{item.rating}</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-500 font-medium">{item.time}</div>
+
+                {selectedPlan === plan.id && (
+                  <div className="mt-4 pt-4 border-t border-pink-200">
+                    <Badge className="bg-pink-500 text-white">선택됨</Badge>
                   </div>
-                  
-                  <p className="text-gray-600 mb-3">{item.description}</p>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="w-4 h-4" />
-                      <span>{item.location}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-4 h-4" />
-                      <span>예상 소요시간: {item.duration}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <Button variant="ghost" size="sm" className="flex-shrink-0">
-                  <Edit3 className="w-4 h-4" />
-                </Button>
-              </div>
-            </Card>
-          ))}
+                )}
+              </Card>
+            ))}
+          </div>
         </div>
 
-        {/* Special Places Notice */}
-        {formData.specialPlaces && (
-          <Card className="mt-8 p-6 bg-gradient-to-r from-pink-50 to-orange-50 border-pink-200">
-            <h4 className="font-semibold text-gray-800 mb-2">🎯 요청하신 장소가 포함되었어요!</h4>
-            <p className="text-gray-600">{formData.specialPlaces}</p>
-          </Card>
+        {/* Selected Plan Details */}
+        {selectedPlan && (
+          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                선택한 일정: {planOptions.find(p => p.id === selectedPlan)?.title}
+              </h2>
+              <Button onClick={handleShare} variant="outline" className="flex items-center space-x-2">
+                <Share2 className="w-4 h-4" />
+                <span>공유하기</span>
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              {planOptions.find(p => p.id === selectedPlan)?.activities.map((activity, index) => (
+                <div key={index} className="flex items-start space-x-4 p-4 rounded-lg bg-gray-50">
+                  <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-800">{activity.place}</h3>
+                      <Badge variant="outline">{activity.time}</Badge>
+                    </div>
+                    <p className="text-gray-600 mb-2">{activity.activity}</p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{activity.duration}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>위치 보기</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Heart className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-8">
-          <Button
+        <div className="flex justify-center space-x-4">
+          <Button 
+            asChild 
+            variant="outline" 
             size="lg"
-            className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white flex-1"
-            onClick={handleShare}
+            className="px-8"
           >
-            <Share2 className="w-4 h-4 mr-2" />
-            친구들과 공유하기
+            <Link to="/create">새로운 일정 만들기</Link>
           </Button>
-          <Link to="/create" className="flex-1">
-            <Button size="lg" variant="outline" className="w-full">
-              <Edit3 className="w-4 h-4 mr-2" />
-              새로운 일정 만들기
+          {selectedPlan && (
+            <Button 
+              size="lg"
+              className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white px-8"
+              onClick={handleShare}
+            >
+              선택한 일정 공유하기
             </Button>
-          </Link>
+          )}
         </div>
       </div>
     </div>
