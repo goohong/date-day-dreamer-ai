@@ -1,73 +1,229 @@
-# Welcome to your Lovable project
+### [배포 URL](https://date-day-dreamer-ai.lovable.app/)
 
-## Project info
+## **페르소나**
 
-**URL**: https://lovable.dev/projects/454034a5-db8c-45e5-b456-014ce9894105
+**이름**: 김민수
 
-## How can I edit this code?
+**나이**: 21세
 
-There are several ways of editing your application.
+**성별**: 남성
 
-**Use Lovable**
+**전공**: 경영학
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/454034a5-db8c-45e5-b456-014ce9894105) and start prompting.
+**거주지**: 서울 동작구
 
-Changes made via Lovable will be committed automatically to this repo.
+**사용 기기**: iPhone 13
 
-**Use your preferred IDE**
+**성격**: 활동적이고 계획적인 성향. 친구들과 즉흥적인 만남도 즐기지만, 데이트나 여행에는 어느 정도의 계획이 필요하다고 생각함.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+**목표**: 연인과의 데이트를 알차고 즐겁게 보내고 싶고, 코스나 일정 계획을 자동으로 추천받아 스트레스를 줄이고 싶다.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**니즈**:
 
-Follow these steps:
+- 데이트 코스를 시간대별로 추천해주는 AI
+    
+- 최소 조건만 입력하면 자동으로 일정 생성
+    
+- 장소 커스터마이징 기능 (맛집, 카페, 영화관 등 추가 가능)
+    
+- 걷는 시간, 이동 시간도 고려한 스마트한 코스 설계
+    
+- 친구나 연인과 쉽게 공유 가능
+    
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## **📘** 
 
-# Step 3: Install the necessary dependencies.
-npm i
+## **사용자 시나리오**
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+  
 
-**Edit a file directly in GitHub**
+**목표**: 연인과의 데이트를 위해 코스와 일정을 자동으로 추천받기
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+  
 
-**Use GitHub Codespaces**
+**시나리오**:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+민수는 여자친구와 이번 주말에 데이트 약속이 있다. 하지만 바쁜 과제와 아르바이트 일정 때문에 자세한 데이트 코스를 짤 시간이 없다.
 
-## What technologies are used for this project?
+그는 스마트폰에서 '일정 플래너’ 앱을 실행한다.
 
-This project is built with:
+앱은 민수에게 기본 정보를 묻는다. “인원 수: 2명”, “지역: 홍대”, “원하는 일정 종류: 휴식 + 맛집 탐방”.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+민수는 옵션으로 “저녁에 분위기 좋은 루프탑 카페”를 꼭 넣어달라고 설정한다.
 
-## How can I deploy this project?
+AI는 몇 초 만에 **오전 11시부터 오후 7시까지의 데이트 코스**를 10분 단위로 자동으로 구성한다.
 
-Simply open [Lovable](https://lovable.dev/projects/454034a5-db8c-45e5-b456-014ce9894105) and click on Share -> Publish.
+앱은 각 장소의 예상 소요 시간, 이동 거리, 예약 가능 여부까지 보여준다.
 
-## Can I connect a custom domain to my Lovable project?
+민수는 루트를 확인하고 몇 가지 취향에 맞게 식당을 교체한 후, 여자친구에게 링크를 공유한다.
 
-Yes, you can!
+여자친구도 앱을 통해 확인하고 “좋다!”고 반응한다.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+민수는 앱 내에서 식당 예약까지 완료하고, 일정대로 데이트를 즐긴다.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## **🧩** 
+
+## **사용자 스토리 & 인수 조건**
+
+### **✅ 사용자 스토리 1 – 최소 조건으로 일정 추천받기**
+
+**사용자 스토리**:
+
+“연인으로서, 저는 최소한의 정보를 입력해서 자동으로 데이트 일정을 생성받고 싶습니다. 그래서 쉽게 계획을 세우고 스트레스를 줄일 수 있습니다.”
+
+**인수 조건**:
+
+- **Given**: 사용자가 앱을 실행하고 ‘일정 생성’ 기능을 선택한다.
+    
+- **When**: 사용자가 인원 수, 지역, 일정 종류를 입력한다.
+    
+- **Then**: 시스템은 입력 정보를 기반으로 AI가 자동으로 시간별 일정을 제안한다.
+    
+
+---
+
+### **✅ 사용자 스토리 2 – 특정 장소(카페, 식당 등)를 포함시키기**
+
+  
+
+**사용자 스토리**:
+
+“사용자로서, 저는 꼭 가고 싶은 장소를 일정에 포함시키고 싶습니다. 그래서 저만의 맞춤 코스를 만들 수 있습니다.”
+
+  
+
+**인수 조건**:
+
+- **Given**: 사용자가 ‘일정 생성’ 중 옵션에서 특정 장소를 추가한다.
+    
+- **When**: 사용자가 해당 장소의 이름이나 주소를 입력한다.
+    
+- **Then**: 시스템은 해당 장소를 일정 내 적절한 시간에 자동 배치하고, 나머지 일정을 그에 맞춰 재조정한다.
+    
+
+---
+
+### **✅ 사용자 스토리 3 – 일정 공유 기능**
+
+  
+
+**사용자 스토리**:
+
+“사용자로서, 저는 만들어진 일정을 함께할 사람에게 쉽게 공유하고 싶습니다. 그래서 함께 일정을 확인하고 조율할 수 있습니다.”
+
+  
+
+**인수 조건**:
+
+- **Given**: 사용자가 일정 생성을 완료하고 확인 화면에 있다.
+    
+- **When**: 사용자가 ‘일정 공유’ 버튼을 누른다.
+    
+- **Then**: 시스템은 공유 가능한 링크 또는 메시지를 생성한다.
+
+## **🎯** 
+
+## **핵심 가치 제안**
+
+1. **데이트 및 여행 계획 자동화**
+    
+    → 인원 수, 지역, 일정 종류만 입력하면 **AI가 분 단위로 코스 자동 설계**, 계획 스트레스 해소
+    
+2. **개인 맞춤형 일정 커스터마이징**
+    
+    → 꼭 가고 싶은 장소(맛집, 카페, 영화관 등)를 입력하면 **AI가 자동으로 최적 시간에 배치**, 일정 흐름 자연스럽게 구성
+    
+3. **공유 중심의 경험 설계**
+    
+    → 만들어진 일정을 **링크 한 번으로 연인, 친구들과 공유**, 함께 수정 및 확인 가능
+    
+4. **현실적이고 실용적인 동선 추천**
+    
+    → 실제 거리, 소요 시간, 영업시간 등 고려한 추천으로 **이동 피로 최소화 + 체험 최적화**
+    
+
+---
+
+## **🧩** 
+
+## **핵심 기능**
+
+1. **AI 기반 일정 자동 생성**
+    
+    - 인원 수, 지역, 일정 종류(예: 액티비티, 휴식, 맛집 탐방 등) 선택 → 일정 자동 생성
+        
+    - 시간대별(예: 오전 11시~오후 7시) 분 단위로 코스 추천
+        
+    
+2. **장소 추가 및 커스터마이징**
+    
+    - 사용자가 원하는 장소(예: 무조건 가고 싶은 카페)를 일정에 포함 가능
+        
+    - AI가 자동으로 일정 재구성
+        
+    
+3. **일정 미리보기 및 공유**
+    
+    - 완성된 일정을 한눈에 확인 가능한 UI 제공 (지도 기반/타임라인 기반)
+        
+    - 공유 링크 또는 QR코드로 일정 공유 가능
+        
+    
+4. **선택적 예약 연동**
+    
+    - 식당, 카페, 전시 등 예약이 필요한 장소는 버튼 클릭으로 예약 페이지 이동 가능
+        
+    
+
+---
+
+## **🛠** 
+
+## **구현 범위 (MVP - 최소 기능 제품)**
+
+  
+
+### **1.** 
+
+### **AI 일정 추천 시스템 (목업 기반)**
+
+- 실제 AI가 아닌, 미리 정의된 추천 로직 또는 랜덤 알고리즘 기반 일정 생성
+    
+- 조건: 지역(예: 홍대), 인원 수(1~4명), 일정 종류(맛집, 휴식, 데이트 등)
+    
+
+  
+
+### **2.** 
+
+### **장소 커스터마이징 기능**
+
+- 사용자가 선택한 장소를 미리 정의된 일정에 삽입
+    
+- 삽입 위치는 고정 or 시간대 기반 자동 배치 로직 적용
+    
+
+  
+
+### **3.** 
+
+### **일정 보기 및 공유 기능**
+
+- 타임라인 형식 UI 구성
+    
+- 가상의 공유 링크 생성 (실제 공유는 하지 않음, UI만 구현)
+    
+
+---
+
+💡 **추가 팁 (테스트용)**
+
+- 목업 응답: “홍대 + 2명 + 휴식” 조건에 따라 고정 일정 출력
+    
+- 장소 추가 시: 미리 정의된 3~5개 랜드마크 중 선택 가능
+    
+- UI 프레임워크: Figma 또는 React 기반 프로토타입 추천
