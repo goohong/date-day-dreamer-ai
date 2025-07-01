@@ -6,53 +6,67 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Clock, MapPin, Share2, Heart, Star, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import GoogleMap from "@/components/GoogleMap";
 
 // Mock data generator for multiple plan options
 const generatePlanOptions = (formData: any) => {
+  const baseActivities = [
+    { name: "블루보틀 커피", type: "카페", lat: 37.5519, lng: 126.9918 },
+    { name: "홍대 걷고싶은거리", type: "쇼핑", lat: 37.5513, lng: 126.9922 },
+    { name: "더현대 서울", type: "쇼핑몰", lat: 37.5258, lng: 127.0286 },
+    { name: "한강공원 여의도", type: "공원", lat: 37.5285, lng: 126.9244 },
+    { name: "63빌딩 전망대", type: "전망대", lat: 37.5197, lng: 126.9394 },
+    { name: "홍대 볼링장", type: "볼링", lat: 37.5512, lng: 126.9915 },
+    { name: "교촌치킨", type: "식당", lat: 37.5515, lng: 126.9920 },
+    { name: "방탈출 카페", type: "게임", lat: 37.5517, lng: 126.9925 },
+    { name: "망원한강공원", type: "공원", lat: 37.5502, lng: 126.8944 },
+    { name: "테라로사 커피", type: "카페", lat: 37.5520, lng: 126.9930 }
+  ];
+
   const plans = [
     {
       id: 1,
-      title: "로맨틱 코스",
-      description: "분위기 좋은 장소들로 구성된 감성적인 코스",
+      title: "추천 코스 A",
+      description: "균형 잡힌 다양한 활동으로 구성된 코스",
       rating: 4.8,
       duration: `${formData.startTime || '10:00'} - ${formData.endTime || '18:00'}`,
       totalTime: "8시간",
       activities: [
-        { time: formData.startTime || "10:00", place: "블루보틀 커피 홍대점", activity: "모닝 커피", duration: "1시간" },
-        { time: "11:30", place: "홍대 걷고싶은거리", activity: "산책 및 쇼핑", duration: "2시간" },
-        { time: "13:30", place: "더현대 서울", activity: "점심 식사", duration: "1.5시간" },
-        { time: "15:30", place: "한강공원 여의도", activity: "피크닉", duration: "2시간" },
-        { time: "18:00", place: "63빌딩 전망대", activity: "석양 감상", duration: "1시간" }
+        { time: formData.startTime || "10:00", place: "블루보틀 커피 홍대점", activity: "모닝 커피", duration: "1시간", location: baseActivities[0] },
+        { time: "11:30", place: "홍대 걷고싶은거리", activity: "산책 및 쇼핑", duration: "2시간", location: baseActivities[1] },
+        { time: "13:30", place: "더현대 서울", activity: "점심 식사", duration: "1.5시간", location: baseActivities[2] },
+        { time: "15:30", place: "한강공원 여의도", activity: "피크닉", duration: "2시간", location: baseActivities[3] },
+        { time: "18:00", place: "63빌딩 전망대", activity: "석양 감상", duration: "1시간", location: baseActivities[4] }
       ]
     },
     {
       id: 2,
-      title: "액티브 코스",
+      title: "추천 코스 B",
       description: "활동적이고 재미있는 체험 중심의 코스",
       rating: 4.6,
       duration: `${formData.startTime || '10:00'} - ${formData.endTime || '18:00'}`,
       totalTime: "8시간",
       activities: [
-        { time: formData.startTime || "10:00", place: "홍대 볼링장", activity: "볼링", duration: "1.5시간" },
-        { time: "12:00", place: "교촌치킨 홍대점", activity: "점심 식사", duration: "1시간" },
-        { time: "14:00", place: "홍대 방탈출 카페", activity: "방탈출 게임", duration: "1.5시간" },
-        { time: "16:00", place: "홍대 노래방", activity: "노래방", duration: "1.5시간" },
-        { time: "18:00", place: "홍대 포차거리", activity: "저녁 식사", duration: "2시간" }
+        { time: formData.startTime || "10:00", place: "홍대 볼링장", activity: "볼링", duration: "1.5시간", location: baseActivities[5] },
+        { time: "12:00", place: "교촌치킨 홍대점", activity: "점심 식사", duration: "1시간", location: baseActivities[6] },
+        { time: "14:00", place: "홍대 방탈출 카페", activity: "방탈출 게임", duration: "1.5시간", location: baseActivities[7] },
+        { time: "16:00", place: "홍대 노래방", activity: "노래방", duration: "1.5시간", location: { name: "홍대 노래방", type: "노래방", lat: 37.5518, lng: 126.9928 } },
+        { time: "18:00", place: "홍대 포차거리", activity: "저녁 식사", duration: "2시간", location: { name: "홍대 포차거리", type: "식당", lat: 37.5521, lng: 126.9932 } }
       ]
     },
     {
       id: 3,
-      title: "힐링 코스",
+      title: "추천 코스 C",
       description: "여유롭고 편안한 휴식 중심의 코스",
       rating: 4.7,
       duration: `${formData.startTime || '10:00'} - ${formData.endTime || '18:00'}`,
       totalTime: "8시간",
       activities: [
-        { time: formData.startTime || "10:00", place: "망원한강공원", activity: "아침 산책", duration: "1시간" },
-        { time: "11:30", place: "테라로사 홍대점", activity: "브런치 & 커피", duration: "2시간" },
-        { time: "14:00", place: "홍대 독립서점", activity: "책 구경", duration: "1시간" },
-        { time: "15:30", place: "홍대 스파", activity: "마사지 & 휴식", duration: "2시간" },
-        { time: "18:00", place: "홍대 루프탑 바", activity: "선셋 드링크", duration: "1.5시간" }
+        { time: formData.startTime || "10:00", place: "망원한강공원", activity: "아침 산책", duration: "1시간", location: baseActivities[8] },
+        { time: "11:30", place: "테라로사 홍대점", activity: "브런치 & 커피", duration: "2시간", location: baseActivities[9] },
+        { time: "14:00", place: "홍대 독립서점", activity: "책 구경", duration: "1시간", location: { name: "홍대 독립서점", type: "서점", lat: 37.5522, lng: 126.9935 } },
+        { time: "15:30", place: "홍대 스파", activity: "마사지 & 휴식", duration: "2시간", location: { name: "홍대 스파", type: "스파", lat: 37.5516, lng: 126.9924 } },
+        { time: "18:00", place: "홍대 루프탑 바", activity: "선셋 드링크", duration: "1.5시간", location: { name: "홍대 루프탑 바", type: "바", lat: 37.5525, lng: 126.9938 } }
       ]
     }
   ];
@@ -74,6 +88,17 @@ const PlanResult = () => {
   const handleSelectPlan = (planId: number) => {
     setSelectedPlan(planId);
     toast.success("일정이 선택되었습니다!");
+  };
+
+  const getSelectedPlanLocations = () => {
+    const selected = planOptions.find(p => p.id === selectedPlan);
+    if (!selected) return [];
+    
+    return selected.activities.map(activity => ({
+      name: activity.place,
+      lat: activity.location.lat,
+      lng: activity.location.lng
+    }));
   };
 
   return (
@@ -103,9 +128,7 @@ const PlanResult = () => {
             🎉 AI가 추천하는 완벽한 일정
           </h1>
           <p className="text-lg text-gray-600 mb-6">
-            {formData.people}명 • {formData.location} • {formData.planType === 'relaxed' ? '여유로운 휴식' : 
-             formData.planType === 'foodie' ? '맛집 탐방' : 
-             formData.planType === 'active' ? '액티비티' : '문화생활'}
+            {formData.people}명 • {formData.location} • {formData.planTypes?.join(', ') || '맞춤형 일정'}
           </p>
           <div className="flex items-center justify-center space-x-4">
             <Badge variant="secondary" className="px-4 py-2">
@@ -186,7 +209,7 @@ const PlanResult = () => {
           </div>
         </div>
 
-        {/* Selected Plan Details */}
+        {/* Selected Plan Details with Map */}
         {selectedPlan && (
           <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
             <div className="flex items-center justify-between mb-6">
@@ -197,6 +220,12 @@ const PlanResult = () => {
                 <Share2 className="w-4 h-4" />
                 <span>공유하기</span>
               </Button>
+            </div>
+
+            {/* Map Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">코스 지도</h3>
+              <GoogleMap locations={getSelectedPlanLocations()} />
             </div>
 
             <div className="space-y-6">

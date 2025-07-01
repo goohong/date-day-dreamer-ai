@@ -7,16 +7,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Users, MapPin, Calendar, Plus, Sparkles, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Users, MapPin, Calendar, Plus, Sparkles, Clock, X, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const CreatePlan = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     people: "",
     location: "",
-    planType: "",
+    planTypes: [] as string[],
     detailedCategories: [] as string[],
     customActivities: "",
     startTime: "",
@@ -55,11 +56,54 @@ const CreatePlan = () => {
     }
   };
 
+  const handlePlanTypeAdd = (planType: string) => {
+    if (!formData.planTypes.includes(planType)) {
+      updateFormData('planTypes', [...formData.planTypes, planType]);
+    }
+  };
+
+  const handlePlanTypeRemove = (planType: string) => {
+    updateFormData('planTypes', formData.planTypes.filter(type => type !== planType));
+  };
+
+  const validateTimeRange = (startTime: string, endTime: string) => {
+    if (!startTime || !endTime) return true;
+    
+    const start = parseInt(startTime.replace(':', ''));
+    const end = parseInt(endTime.replace(':', ''));
+    
+    if (start >= end) {
+      toast.error("시작 시간은 종료 시간보다 이전이어야 합니다.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleTimeChange = (field: 'startTime' | 'endTime', value: string) => {
+    const newFormData = { ...formData, [field]: value };
+    
+    if (field === 'startTime' && newFormData.endTime) {
+      if (!validateTimeRange(value, newFormData.endTime)) return;
+    }
+    if (field === 'endTime' && newFormData.startTime) {
+      if (!validateTimeRange(newFormData.startTime, value)) return;
+    }
+    
+    updateFormData(field, value);
+  };
+
   const categoryOptions = {
     relaxed: ["카페", "공원", "쇼핑몰", "북카페", "산책로", "전망대"],
     foodie: ["한식", "양식", "일식", "중식", "디저트", "술집", "브런치"],
     active: ["볼링", "노래방", "게임", "스포츠", "체험활동", "워크숍"],
     culture: ["전시회", "박물관", "영화관", "공연", "갤러리", "문화센터"]
+  };
+
+  const planTypeLabels = {
+    relaxed: "여유로운 휴식",
+    foodie: "맛집 탐방", 
+    active: "액티비티",
+    culture: "문화생활"
   };
 
   const timeOptions = Array.from({ length: 24 }, (_, i) => {
@@ -139,12 +183,12 @@ const CreatePlan = () => {
                       <SelectValue placeholder="지역을 선택해주세요" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="hongdae">홍대</SelectItem>
-                      <SelectItem value="gangnam">강남</SelectItem>
-                      <SelectItem value="myeongdong">명동</SelectItem>
-                      <SelectItem value="itaewon">이태원</SelectItem>
-                      <SelectItem value="jamsil">잠실</SelectItem>
-                      <SelectItem value="sinchon">신촌</SelectItem>
+                      <SelectItem value="홍대">홍대</SelectItem>
+                      <SelectItem value="강남">강남</SelectItem>
+                      <SelectItem value="명동">명동</SelectItem>
+                      <SelectItem value="이태원">이태원</SelectItem>
+                      <SelectItem value="잠실">잠실</SelectItem>
+                      <SelectItem value="신촌">신촌</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -159,42 +203,67 @@ const CreatePlan = () => {
                   <Calendar className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">어떤 일정을 원하시나요?</h2>
-                <p className="text-gray-600">취향에 맞는 코스를 추천해드릴게요</p>
+                <p className="text-gray-600">원하는 일정 종류를 모두 선택해주세요</p>
               </div>
 
               <div className="space-y-6">
+                {/* 선택된 일정 종류 표시 */}
+                {formData.planTypes.length > 0 && (
+                  <div className="p-4 bg-pink-50 rounded-lg border border-pink-200">
+                    <Label className="text-base font-medium mb-3 block">선택된 일정 종류</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.planTypes.map((type) => (
+                        <Badge 
+                          key={type} 
+                          variant="secondary" 
+                          className="px-3 py-1 bg-gradient-to-r from-pink-500 to-orange-500 text-white"
+                        >
+                          {planTypeLabels[type as keyof typeof planTypeLabels]}
+                          <button
+                            onClick={() => handlePlanTypeRemove(type)}
+                            className="ml-2 hover:bg-white/20 rounded-full p-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
-                  <Label className="text-base font-medium mb-3 block">일정 종류 (대분류)</Label>
-                  <RadioGroup value={formData.planType} onValueChange={(value) => updateFormData('planType', value)}>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
-                      <RadioGroupItem value="relaxed" id="relaxed" />
-                      <Label htmlFor="relaxed">여유로운 휴식</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
-                      <RadioGroupItem value="foodie" id="foodie" />
-                      <Label htmlFor="foodie">맛집 탐방</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
-                      <RadioGroupItem value="active" id="active" />
-                      <Label htmlFor="active">액티비티</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-pink-50 transition-colors">
-                      <RadioGroupItem value="culture" id="culture" />
-                      <Label htmlFor="culture">문화생활</Label>
-                    </div>
-                  </RadioGroup>
+                  <Label className="text-base font-medium mb-3 block">일정 종류 추가</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {Object.entries(planTypeLabels).map(([key, label]) => (
+                      <Button
+                        key={key}
+                        variant={formData.planTypes.includes(key) ? "default" : "outline"}
+                        onClick={() => handlePlanTypeAdd(key)}
+                        disabled={formData.planTypes.includes(key)}
+                        className="justify-start"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        {label}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
 
-                {formData.planType && (
+                {formData.planTypes.length > 0 && (
                   <div>
                     <Label className="text-base font-medium mb-3 block">세부 카테고리 (선택사항)</Label>
                     <div className="grid grid-cols-2 gap-3">
-                      {categoryOptions[formData.planType as keyof typeof categoryOptions]?.map((category) => (
-                        <div key={category} className="flex items-center space-x-2">
-                          <Checkbox
+                      {formData.planTypes.flatMap(planType => 
+                        categoryOptions[planType as keyof typeof categoryOptions] || []
+                      ).filter((category, index, array) => array.indexOf(category) === index)
+                      .map((category) => (
+                        <div key={category} className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-pink-50">
+                          <input
+                            type="checkbox"
                             id={category}
                             checked={formData.detailedCategories.includes(category)}
-                            onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                            onChange={(e) => handleCategoryChange(category, e.target.checked)}
+                            className="rounded border-gray-300"
                           />
                           <Label htmlFor={category} className="text-sm">{category}</Label>
                         </div>
@@ -224,7 +293,7 @@ const CreatePlan = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="start-time" className="text-sm text-gray-600 mb-1 block">시작 시간</Label>
-                      <Select value={formData.startTime} onValueChange={(value) => updateFormData('startTime', value)}>
+                      <Select value={formData.startTime} onValueChange={(value) => handleTimeChange('startTime', value)}>
                         <SelectTrigger>
                           <SelectValue placeholder="시작 시간" />
                         </SelectTrigger>
@@ -237,7 +306,7 @@ const CreatePlan = () => {
                     </div>
                     <div>
                       <Label htmlFor="end-time" className="text-sm text-gray-600 mb-1 block">종료 시간</Label>
-                      <Select value={formData.endTime} onValueChange={(value) => updateFormData('endTime', value)}>
+                      <Select value={formData.endTime} onValueChange={(value) => handleTimeChange('endTime', value)}>
                         <SelectTrigger>
                           <SelectValue placeholder="종료 시간" />
                         </SelectTrigger>
@@ -249,6 +318,13 @@ const CreatePlan = () => {
                       </Select>
                     </div>
                   </div>
+                  {formData.startTime && formData.endTime && 
+                   parseInt(formData.startTime.replace(':', '')) >= parseInt(formData.endTime.replace(':', '')) && (
+                    <div className="flex items-center space-x-2 mt-2 text-red-600">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="text-sm">시작 시간은 종료 시간보다 이전이어야 합니다</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -307,7 +383,8 @@ const CreatePlan = () => {
               onClick={handleNext}
               disabled={
                 (step === 1 && (!formData.people || !formData.location)) ||
-                (step === 2 && (!formData.planType || !formData.startTime || !formData.endTime))
+                (step === 2 && (formData.planTypes.length === 0 || !formData.startTime || !formData.endTime ||
+                 parseInt(formData.startTime.replace(':', '')) >= parseInt(formData.endTime.replace(':', ''))))
               }
               className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white px-6"
             >
