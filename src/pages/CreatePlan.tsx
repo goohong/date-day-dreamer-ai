@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,14 +12,30 @@ import TimeSelector from "@/components/TimeSelector";
 import PlaceSearch from "@/components/PlaceSearch";
 import SelectedItinerary from "@/components/SelectedItinerary";
 
+// 새로운 타입 정의
+const DEFAULT_STAY = { hours: 1, minutes: 0 };
+
+const initialPlacesData = [
+  { name: '한끼맛있다', category: '식당', location: '홍대입구역 2번 출구', image: '/placeholder.svg', stayTime: { hours: 1, minutes: 30 } },
+  { name: '스타벅스 홍대점', category: '카페', location: '홍대입구역 9번 출구', image: '/placeholder.svg', stayTime: { hours: 1, minutes: 0 } },
+  { name: '홍대 걷고싶은거리', category: '명소', location: '홍익대학교 앞', image: '/placeholder.svg', stayTime: { hours: 2, minutes: 0 } },
+  { name: '더현대 서울', category: '명소', location: '여의도역 3번 출구', image: '/placeholder.svg', stayTime: { hours: 3, minutes: 0 } },
+  { name: '롯데월드타워', category: '명소', location: '잠실역 1번 출구', image: '/placeholder.svg', stayTime: { hours: 2, minutes: 30 } },
+  { name: '블루보틀 커피', category: '카페', location: '성수역 2번 출구', image: '/placeholder.svg', stayTime: { hours: 1, minutes: 0 } },
+];
+
+function findPlaceData(name) {
+  return initialPlacesData.find(p => p.name === name);
+}
+
 const CreatePlan = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     people: "",
     location: "",
-    selectedPlaces: [] as string[],
-    startTime: "",
-    endTime: "",
+    selectedPlaces: [] as any[], // 객체 배열로 변경
+    startTime: "09:00",
+    endTime: "21:00",
     transportation: "",
     specialPlaces: "",
     preferences: ""
@@ -50,19 +65,34 @@ const CreatePlan = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const togglePlace = (place: string) => {
+  // 장소 토글 (추가/제거)
+  const togglePlace = (placeName: string) => {
+    setFormData(prev => {
+      const exists = prev.selectedPlaces.find((p: any) => p.name === placeName);
+      if (exists) {
+        return { ...prev, selectedPlaces: prev.selectedPlaces.filter((p: any) => p.name !== placeName) };
+      } else {
+        const placeData = findPlaceData(placeName);
+        return { ...prev, selectedPlaces: [...prev.selectedPlaces, { ...placeData, stayTime: placeData?.stayTime || DEFAULT_STAY }] };
+      }
+    });
+  };
+
+  // 장소 제거
+  const removePlace = (placeName: string) => {
     setFormData(prev => ({
       ...prev,
-      selectedPlaces: prev.selectedPlaces.includes(place)
-        ? prev.selectedPlaces.filter(p => p !== place)
-        : [...prev.selectedPlaces, place]
+      selectedPlaces: prev.selectedPlaces.filter((p: any) => p.name !== placeName)
     }));
   };
 
-  const removePlace = (place: string) => {
+  // 머무는 시간 수정
+  const handleUpdateStayTime = (placeName: string, stayTime: { hours: number; minutes: number }) => {
     setFormData(prev => ({
       ...prev,
-      selectedPlaces: prev.selectedPlaces.filter(p => p !== place)
+      selectedPlaces: prev.selectedPlaces.map((p: any) =>
+        p.name === placeName ? { ...p, stayTime } : p
+      )
     }));
   };
 
@@ -170,9 +200,7 @@ const CreatePlan = () => {
                       <Label className="text-base font-medium mb-3 block">전체 일정 시간</Label>
                       <div className="flex items-center gap-4 flex-wrap">
                         <div className="flex items-center gap-2">
-                          <span className="flex items-center gap-1 font-medium text-gray-700">
-                            <Clock className="w-4 h-4 text-pink-500" /> 시작
-                          </span>
+                          <span className="font-medium text-gray-700">시작</span>
                           <TimeSelector
                             value={formData.startTime}
                             onChange={(value) => updateFormData('startTime', value)}
@@ -208,7 +236,7 @@ const CreatePlan = () => {
                   </div>
 
                   <PlaceSearch
-                    selectedPlaces={formData.selectedPlaces}
+                    selectedPlaces={formData.selectedPlaces.map((p: any) => p.name)}
                     onPlaceToggle={togglePlace}
                   />
                 </div>
@@ -321,6 +349,7 @@ const CreatePlan = () => {
               <SelectedItinerary
                 selectedPlaces={formData.selectedPlaces}
                 onRemovePlace={removePlace}
+                onUpdateStayTime={handleUpdateStayTime}
               />
             </div>
           )}
