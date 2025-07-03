@@ -123,7 +123,7 @@ const CreatePlan = () => {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <span className="font-semibold bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-transparent">
-              DatePlanner AI
+              Planmate
             </span>
           </div>
         </div>

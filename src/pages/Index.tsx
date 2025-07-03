@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Clock, Users, Share2, Sparkles } from "lucide-react";
@@ -15,7 +14,7 @@ const Index = () => {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-transparent">
-              DatePlanner AI
+              Planmate
             </h1>
           </div>
           <Button variant="outline" className="hidden md:flex">
@@ -29,7 +28,7 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           <div className="animate-fade-in">
             <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-orange-600 bg-clip-text text-transparent">
-              완벽한 데이트 코스를
+              완벽한 약속 코스를
               <br />
               AI가 자동으로 계획해드려요
             </h2>
@@ -46,7 +45,7 @@ const Index = () => {
                 className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <Sparkles className="w-5 h-5 mr-2" />
-                데이트 일정 만들기
+                약속 일정 만들기
               </Button>
             </Link>
           </div>
@@ -57,7 +56,7 @@ const Index = () => {
       <section className="px-6 py-20 bg-white/50">
         <div className="max-w-6xl mx-auto">
           <h3 className="text-3xl font-bold text-center mb-12 text-gray-800">
-            왜 DatePlanner AI를 선택해야 할까요?
+            왜 Planmate를 선택해야 할까요?
           </h3>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -108,7 +107,7 @@ const Index = () => {
       <section className="px-6 py-20 bg-gradient-to-r from-pink-500 to-orange-500 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h3 className="text-3xl font-bold mb-4">
-            지금 바로 완벽한 데이트를 계획해보세요
+            지금 바로 완벽한 약속을 계획해보세요
           </h3>
           <p className="text-lg mb-8 opacity-90">
             김민수씨처럼 바쁜 일상 속에서도 특별한 추억을 만들어보세요
@@ -128,7 +127,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="px-6 py-8 bg-gray-50 border-t border-gray-200">
         <div className="max-w-6xl mx-auto text-center text-gray-600">
-          <p>&copy; 2024 DatePlanner AI. 모든 권리 보유.</p>
+          <p>&copy; 2024 Planmate. 모든 권리 보유.</p>
         </div>
       </footer>
     </div>

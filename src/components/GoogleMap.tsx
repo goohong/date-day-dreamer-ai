@@ -1,6 +1,7 @@
-
-import React, { useEffect, useRef } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface GoogleMapProps {
   places: Array<{
@@ -11,67 +12,58 @@ interface GoogleMapProps {
   className?: string;
 }
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
+// 지도 bounds를 마커에 맞게 fitBounds
+const FitBounds: React.FC<{ places: GoogleMapProps['places'] }> = ({ places }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (places.length === 0) return;
+    const bounds = L.latLngBounds(places.map(p => [p.lat, p.lng]));
+    map.fitBounds(bounds, { padding: [40, 40] });
+  }, [places, map]);
+  return null;
+};
 
 const GoogleMap: React.FC<GoogleMapProps> = ({ places, className }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+  // Polyline 좌표
+  const polylinePositions = places.map(p => [p.lat, p.lng]) as [number, number][];
 
-  useEffect(() => {
-    const initMap = async () => {
-      const loader = new Loader({
-        apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'demo-key',
-        version: 'weekly',
-      });
+  // 숫자 라벨 마커 옵션
+  const createNumberIcon = (num: number) => L.divIcon({
+    html: `<div style="background: #fff; border: 2px solid #f472b6; color: #e11d48; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 15px; box-shadow: 0 2px 6px #0001;">${num}</div>`,
+    className: '',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
 
-      try {
-        await loader.load();
-        
-        if (!mapRef.current) return;
-
-        const map = new window.google.maps.Map(mapRef.current, {
-          center: { lat: 37.5665, lng: 126.9780 }, // Seoul center
-          zoom: 12,
-        });
-
-        // Add markers for each place
-        places.forEach((place, index) => {
-          new window.google.maps.Marker({
-            position: { lat: place.lat, lng: place.lng },
-            map: map,
-            title: place.name,
-            label: (index + 1).toString(),
-          });
-        });
-
-        // Fit map to show all markers
-        if (places.length > 0) {
-          const bounds = new window.google.maps.LatLngBounds();
-          places.forEach(place => {
-            bounds.extend({ lat: place.lat, lng: place.lng });
-          });
-          map.fitBounds(bounds);
-        }
-      } catch (error) {
-        console.error('Google Maps loading error:', error);
-        // Show fallback content
-        if (mapRef.current) {
-          mapRef.current.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">지도를 불러올 수 없습니다</div>';
-        }
-      }
-    };
-
-    initMap();
-  }, [places]);
+  // 기본 중심: 서울
+  const center = places.length > 0
+    ? [places[0].lat, places[0].lng]
+    : [37.5665, 126.9780];
 
   return (
-    <div 
-      ref={mapRef} 
-      className={`w-full h-64 bg-gray-100 rounded-lg ${className}`}
-    />
+    <MapContainer
+      center={center as [number, number]}
+      zoom={13}
+      scrollWheelZoom={false}
+      style={{ height: '256px', width: '100%', borderRadius: '0.5rem' }}
+      className={className}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
+      />
+      <FitBounds places={places} />
+      {/* 순서대로 선 연결 */}
+      {places.length > 1 && (
+        <Polyline positions={polylinePositions} color="#f472b6" weight={4} opacity={0.7} dashArray="6 8" />
+      )}
+      {/* 숫자 라벨 마커 */}
+      {places.map((place, idx) => (
+        <Marker key={idx} position={[place.lat, place.lng]} icon={createNumberIcon(idx + 1)}>
+          <Popup>{place.name}</Popup>
+        </Marker>
+      ))}
+    </MapContainer>
   );
 };
 
